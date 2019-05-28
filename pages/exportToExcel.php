@@ -24,15 +24,6 @@
 								 ->setLastModifiedBy("Robert Kocjan")
 								 ->setTitle("Sale by Department Raport");
 
-/*
-$a = json_decode($_POST['typesArray']);
-
-
-	foreach($a as $key => $value){
-		echo $key."<br/>";
-	}
-	*/
-
 	$cat = null;
 	
 	$types = array("Category","Sub category","Products");
@@ -62,8 +53,7 @@ $a = json_decode($_POST['typesArray']);
 		
 		$cellNo = 2;
 		
-		print_r($statsArray);
-		
+				
 		foreach($value as $k => $v){
 			if($key == "Category"){
 				$cat = $k;
