@@ -11,8 +11,9 @@
 	
 	
 	$dt = new DATE();
-	
+	echo $_POST['type'];
 	$fileName = $_POST["shop"];
+	$typeName = $_POST["type"];
 	
 	$statsArray = 	array("Category" => json_decode($_POST['typesArray'], true),
 					      "Sub category" => json_decode($_POST['subTypeArray'], true),
@@ -75,7 +76,7 @@
 	
 	$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 		
-	$fileName .= '_'.$cat.'_'.$dt->getCurrentYearDate()['dateEnd'].'.xlsx';
+	$fileName .= '_'.$typeName.'_'.$dt->getCurrentYearDate()['dateEnd'].'.xlsx';
 	
 	$fileName_to_save = $fileName;
 	

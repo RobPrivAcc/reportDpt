@@ -181,13 +181,14 @@
 		});
 		
 		$(document).on("click",'#exportDivButton',function(){
+			var type = $("#type").val();
 			var typeArray = $("#typesArray").val();
 			var subTypeArray = $("#subTypeArray").val();
 			var productsArray = $("#productsArray").val();
 			var shop = $("#shop").val();
 			var header = $("#header").val();
 
-			$.post( "pages/exportToExcel.php", {typesArray:typeArray, subTypeArray:subTypeArray, productsArray:productsArray,shop:shop,header:header })
+			$.post( "pages/exportToExcel.php", {typesArray:typeArray, subTypeArray:subTypeArray, productsArray:productsArray,shop:shop,header:header, type: type })
 				.done(function( data ) {
 					$('#result').html(data);
 					$('#details').html("");
