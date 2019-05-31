@@ -5,19 +5,26 @@ class Content{
     protected $currentIndex = 0;
     protected $animalsArray = array();
     protected $zebraRow = false;
+    protected $cellArray = array();
+    protected $div = null;
     
     
-    function __construct(){
-        //$this->maxIndex = count($array['animals']);
-        //$this->animalsArray = $array;
+    
+    //function __construct(){
+    //    //$this->maxIndex = count($array['animals']);
+    //    //$this->animalsArray = $array;
+    //    
+    //}
+    
+    public function createRow($class="",$id="",$zebra = true){
+        $rowContent = "";
         
-    }
-    
-    protected function createRow($rowContent,$class="",$id=""){
-        if($this->zebraRow == true){
-            $zebra =" style='background-color: #efefef;'";
-        }else{
-            $zebra ="";
+        if($zebra == true){
+            if($this->zebraRow == true){
+                $zebra =" style='background-color: #efefef;'";
+            }else{
+                $zebra ="";
+            }
         }
         
         $divClass = "";
@@ -33,10 +40,16 @@ class Content{
         }        
         
         $this->zebraRow = !$this->zebraRow;
-        return '<div '.$divId.'class="row'.$divClass.'"'.$zebra.'>'.$rowContent.'</div>';
+        
+        for($i=0; $i < count($this->cellArray); $i++){
+            $rowContent .= $this->cellArray[$i];
+        }
+
+        $this->cellArray = array();
+        $this->div .= '<div '.$divId.'class="row'.$divClass.'"'.$zebra.'>'.$rowContent.'</div>';
     }
     
-    protected function createCell($rowContent,$size,$id="",$value=""){
+    public function createCell($rowContent,$size,$class="",$id="",$value=""){
         $idDiv = $id;
         $valueDiv = $value;
         
@@ -44,12 +57,13 @@ class Content{
             $idDiv = ' id = "'.$id.'"';
         }
         
-        return '<div class="col-sm-'.$size.'"'.$idDiv.$valueDiv.'>'.$rowContent.'</div>';
+        //return '<div class="col-sm-'.$size.'"'.$idDiv.$valueDiv.'>'.$rowContent.'</div>';
+        $this->cellArray[] = '<div class="col-sm-'.$size.$class.'"'.$idDiv.$valueDiv.'>'.$rowContent.'</div>';
     }
     
 
  
-    protected function createInput($type,$id,$value="",$size){
+    public function createInput($type,$id,$value="",$size){
         #if($value!=""){
             $value = ' value = "'.$value.'"';
         #}
@@ -58,7 +72,9 @@ class Content{
     }
  
     public function getHidenInput($id,$value){
-        return $this->createInput("hidden",$id,$value,"12");
+        $idDiv = ' id = "'.$id.'"';
+        $valueDiv = $value;
+        $this->div .= '<input type="hidden" class="form-control" id="'.$id.'" value = "'.$value.'"/>';
     }
     
     public function getComment($id){
@@ -68,7 +84,7 @@ class Content{
                   </div>';
     }
     
-    protected function getRadio($name,$array,$size){
+    public function getRadio($name,$array,$size){
             $div = '<div class="btn-group btn-group-toggle" data-toggle="buttons">';
             foreach($array as $key => $value){
                 $div .= '<label class="btn btn-info">';
@@ -78,6 +94,10 @@ class Content{
                 
             $div .= '</div>';
             return $this->createCell($div,$size);
+    }
+    
+    public function showResult(){
+        return $this -> div;
     }
 }
 ?>

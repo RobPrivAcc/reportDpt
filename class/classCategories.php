@@ -6,6 +6,7 @@
         private $pdo=null;
         private $result = array();
         private $dateArray = array();
+        private $detailArray = array();
     
     
     function openConnection($dbConnectionArray){
@@ -15,17 +16,15 @@
             catch (PDOException $e){
                     $this->pdo = new PDO($dbConnectionArray["localServer"],$dbConnectionArray["user"],$dbConnectionArray["password"]);
             }
-            
-            $this->getTypeSubtypeArray();
+            $this->setTypeSubtypeArray();
     }
         
     function setDateArray($array){
         $this->dateArray = $array;
     }
     
-    function getTypeSubtypeArray(){
+    function setTypeSubtypeArray(){
         $array = array();
-        
         $sql = "SELECT [Type] ,[SubType] FROM [Types]";
 
         $query = $this->pdo->prepare($sql);
@@ -37,6 +36,10 @@
             }
         }
         $this->categoryArray = $array;
+    }
+    
+    function getTypeSubtypeArray(){
+        return $this->categoryArray;
     }
     
     function saleTypeDetails($date){
@@ -76,8 +79,10 @@
     
     
     function saleSubTypeDetails($type){
+        
         //print_r($this->dateArray);
-        //print_r($this->categoryArray[$type]);
+        echo count($this->categoryArray[$type])." ".$this->categoryArray[$type][0];
+        
         foreach($this->dateArray as $k => $v){
             foreach($this->categoryArray[$type] as $key => $value){
 //                 [:dateStart] => 2018-01-01 [:dateEnd] => 2018-05-24 [:type] => Bird [:subType] => Bedding
@@ -96,8 +101,6 @@
                                     ":type" => $type,
                                     ":subType" => $value);
                 
-                
-                
                 $query = $this->pdo->prepare($sql);
                 $query->execute($paramArray);
                 
@@ -110,6 +113,31 @@
         }
         
     }
+    
+    
+    function saleProductDetails($type,$subType,$date){
+        $sql = "SELECT [Name of item], SUM([QuantityBought] * [Selling Price]) as [value]
+                FROM Orders
+                    inner join Stock on [Name of Item] = [NameOfItem]
+                    inner join [Days] on [Order Number] = OrderNo
+                WHERE
+                    [Date] > '".$date['dateStart']."' AND
+                    [Date] < '".$date['dateEnd']."' AND
+                    [SubType] = '".$subType."' AND
+                    [Type of Item] = '".$type."'
+                GROUP BY [Name of item]
+                ORDER BY [Name of item] ASC;";
+        
+        $query = $this->pdo->prepare($sql);
+        $query->execute();
+        
+        $value = 0;
+        $year = date("Y",strtotime($date['dateEnd']));
+        while($row = $query->fetch()){
+            $this->detailArray[$row['Name of item']][$year] = round($row['value'],2);
+        }
+        
+    }    
     
     
     function growth($prev, $current){
@@ -130,5 +158,9 @@
         }
         return round($result,2).$isProc;
     }
+    
+    function getSaleDetails(){
+        return $this->detailArray;
     }
+}
 ?>

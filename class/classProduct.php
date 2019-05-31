@@ -87,6 +87,12 @@ class product extends PDOException{
     }
     
      function saleProductDetails($type,$subType,$date){
+        $sub = "";
+        
+        if($subType !=""){
+            $sub = "[SubType] = '".$subType."' AND";
+        }
+        
         $sql = "SELECT [Name of item], SUM([QuantityBought] * [Selling Price]) as [value]
                 FROM Orders
                     inner join Stock on [Name of Item] = [NameOfItem]
@@ -94,7 +100,7 @@ class product extends PDOException{
                 WHERE
                     [Date] > '".$date['dateStart']."' AND
                     [Date] < '".$date['dateEnd']."' AND
-                    [SubType] = '".$subType."' AND
+                    ".$sub."
                     [Type of Item] = '".$type."'
                 GROUP BY [Name of item]
                 ORDER BY [Name of item] ASC;";
