@@ -96,22 +96,22 @@
   
   <script>
         
-    $( document ).ready(function() {
-        console.log( "ready!" );
-				$('#details').html();
-        $('#search').tooltip({title: "Generate stats.", trigger: "hover"});
-        $('#exportToExcel').tooltip({title: "Create <b>Excel</b> file.",  html: true, trigger: "hover"}); 
-        $("#exportToExcel").hide();
-        $('[data-toggle="tooltip"]').tooltip();
-        
-          $.get( "https://www.robertkocjan.com/petRepublic/ip/ipGetArray.php", function(i) {
-                    console.log(i);
-                    var configArray = i;
-          $.get( "getIpFromServer.php", { ipArray: configArray }, function(data) {
-              //console.log(data);
-              });
-        });
-    });
+//    $( document ).ready(function() {
+//        console.log( "ready!" );
+//				$('#details').html();
+//        $('#search').tooltip({title: "Generate stats.", trigger: "hover"});
+//        $('#exportToExcel').tooltip({title: "Create <b>Excel</b> file.",  html: true, trigger: "hover"}); 
+//        $("#exportToExcel").hide();
+//        $('[data-toggle="tooltip"]').tooltip();
+//        
+//          $.get( "https://www.robertkocjan.com/petRepublic/ip/ipGetArray.php", function(i) {
+//                    //console.log(i);
+//                    var configArray = i;
+//          $.get( "getIpFromServer.php", { ipArray: configArray }, function(data) {
+//              //console.log(data);
+//              });
+//        });
+//    });
 		
 		$("#searchBtn").click(function(){
 				$('#details').html("");
@@ -123,62 +123,72 @@
 					$('#result').html(spinner);
 					
 					$.post( "sql/sqlType.php", { shopName: shopsName })
-                  .done(function( data ) {
-                      $('#result').html(data);
-											$('#details').html("");
-											$('#exportDivButton').html("");
-                  }); 
+						.done(function( data ) {
+								$('#result').html(data);
+								$('#details').html("");
+								$('#exportDivButton').html("");
+						}); 
 				}
 		});
 
-		$(document).on("mouseover", "div.selectedCatRow",function() {
+		$(document).on("mouseover", ".row.selectedCatRow",function() {
+				$(this).addClass(' selectedCat');
 				$(this).css({"background-color": "#9bb8e8","cursor": "pointer"});
-				$(this).click(function(){
-					
-					var shopName = $("#shop").val();
-					var type = $(this).children('div.catName').text();
-					var typeArray = $("#typesArray").val();
-
-					var spinner = '<Div class="text-center"><i class="fa fa-cog fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span></DIV>';					
-					$('#result').html(spinner);
-					$('#details').html("");
-					
-					$.post( "sql/sqlSubType.php", { shopName: shopName, type: type, typesArray:typeArray })
-						.done(function( data ) {
-						$('#result').html(data);
-						$('#details').html("");
-					});
-				});
 			}).on("mouseout", "div.selectedCatRow",function() {
 				$(this).css({"background-color": "","cursor": "default"});
-				$(this).removeClass(".pointer");
+				$(this).removeClass("pointer");
+				$(this).removeClass(' selectedCat');
 		});
 		
 		
+		$(document).on("click", ".selectedCat", function(){
+			var shopName = $("#shop").val();
+			var type = $(this).children('div.catName').text();
+			var typeArray = $("#typesArray").val();
+			
+			console.log(shopName+" > "+type+" > "+typeArray);
+			
+			var spinner = '<Div class="text-center"><i class="fa fa-cog fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span></DIV>';					
+			$('#result').html(spinner);
+			$('#details').html("");
+			
+			$.post( "sql/sqlSubType.php", { shopName: shopName, type: type, typesArray:typeArray })
+			.done(function( data ) {
+				$('#result').html(data);
+				$('#details').html("");
+			});
+		});
 		
-		$(document).on("mouseover", "div.selectedSubCatRow",function() {
+		$(document).on("mouseover", ".row.selectedSubCatRow",function() {
+				$(this).addClass(' selectedSubCat');
 				$(this).css({"background-color": "#9bb8e8","cursor": "pointer"});
-				$(this).click(function(){
-					
-					var subType = $(this).children('div.subCatName').text();
-					
-					var shopName = $("#shop").val();
-					var type = $("#type").val();
-					var typeArray = $("#typesArray").val();
-					var subTypeArray = $("#subTypeArray").val();
-					
-					console.log(shopName+" "+ type+" " + subType );
-					
-					$.post( "sql/sqlProductDetails.php", { shopName: shopName, type: type, subType: subType, typesArray:typeArray, subTypeArray:subTypeArray })
-					.done(function( data ) {
-						$('#details').html(data);
-						$('#exportDivButton').html("<button class = 'btn btn-success' id = 'exportToExcel'><i class='fa fa-file-excel-o fa-lg' aria-hidden='true'></i></button>");
-					});	
-				});			
-		}).on("mouseout", "div.selectedSubCatRow",function() {
+		
+			}).on("mouseout", "div.selectedSubCatRow",function() {
 				$(this).css({"background-color": "","cursor": "default"});
-				$(this).removeClass(".pointer");
+				$(this).removeClass("pointer");
+				$(this).removeClass(' selectedSubCat');
 		});
+		
+		$(document).on("click", ".selectedSubCat", function(){
+			
+			var subType = $(this).children('div.subCatName').text();
+			var shopName = $("#shop").val();
+			var type = $("#type").val();
+			var typeArray = $("#typesArray").val();
+			var subTypeArray = $("#subTypeArray").val();
+			
+			var spinner = '<Div class="text-center"><i class="fa fa-cog fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span></DIV>';					
+			//$('#result').html(spinner);
+			$('#details').html(spinner);
+			
+			$.post( "sql/sqlProductDetails.php", { shopName: shopName, type: type, subType: subType, typesArray:typeArray, subTypeArray:subTypeArray })
+			.done(function( data ) {
+				$('#details').html(data);
+				$('#exportDivButton').html("<button class = 'btn btn-success' id = 'exportToExcel'><i class='fa fa-file-excel-o fa-lg' aria-hidden='true'></i></button>");
+			});	
+		});
+		
+		
 		
 		$(document).on("click",'#exportDivButton',function(){
 			var type = $("#type").val();
@@ -187,7 +197,7 @@
 			var productsArray = $("#productsArray").val();
 			var shop = $("#shop").val();
 			var header = $("#header").val();
-
+		
 			$.post( "pages/exportToExcel.php", {typesArray:typeArray, subTypeArray:subTypeArray, productsArray:productsArray,shop:shop,header:header, type: type })
 				.done(function( data ) {
 					$('#result').html(data);

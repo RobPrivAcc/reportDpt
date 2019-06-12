@@ -9,7 +9,6 @@
         4 - Swords
     */
     
-    
     private $user = null;
     private $password = null;
     private $index;

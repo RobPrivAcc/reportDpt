@@ -14,7 +14,7 @@
                 $this->pdo = new PDO($dbConnectionArray["server"],$dbConnectionArray["user"],$dbConnectionArray["password"]); 
             }
             catch (PDOException $e){
-                    $this->pdo = new PDO($dbConnectionArray["localServer"],$dbConnectionArray["user"],$dbConnectionArray["password"]);
+                $this->pdo = new PDO($dbConnectionArray["localServer"],$dbConnectionArray["user"],$dbConnectionArray["password"]);
             }
             $this->setTypeSubtypeArray();
     }
@@ -81,7 +81,7 @@
     function saleSubTypeDetails($type){
         
         //print_r($this->dateArray);
-        echo count($this->categoryArray[$type])." ".$this->categoryArray[$type][0];
+        //echo count($this->categoryArray[$type])." ".$this->categoryArray[$type][0];
         
         foreach($this->dateArray as $k => $v){
             foreach($this->categoryArray[$type] as $key => $value){

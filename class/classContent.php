@@ -7,14 +7,7 @@ class Content{
     protected $zebraRow = false;
     protected $cellArray = array();
     protected $div = null;
-    
-    
-    
-    //function __construct(){
-    //    //$this->maxIndex = count($array['animals']);
-    //    //$this->animalsArray = $array;
-    //    
-    //}
+    protected $background = null;
     
     public function createRow($class="",$id="",$zebra = true){
         $rowContent = "";
@@ -47,21 +40,42 @@ class Content{
 
         $this->cellArray = array();
         $this->div .= '<div '.$divId.'class="row'.$divClass.'"'.$zebra.'>'.$rowContent.'</div>';
+        return $this;
     }
     
     public function createCell($rowContent,$size,$class="",$id="",$value=""){
         $idDiv = $id;
         $valueDiv = $value;
+        $style = "";
+        
+        if($this->background != null){
+            $style .=" ".$this->background;
+        }
         
         if($id != ""){
             $idDiv = ' id = "'.$id.'"';
         }
         
         //return '<div class="col-sm-'.$size.'"'.$idDiv.$valueDiv.'>'.$rowContent.'</div>';
-        $this->cellArray[] = '<div class="col-sm-'.$size.$class.'"'.$idDiv.$valueDiv.'>'.$rowContent.'</div>';
+        $this->cellArray[] = '<div class="col-sm-'.$size.$class.'"'.$idDiv.$valueDiv.$style.'>'.$rowContent.'</div>';
+        //$this->background = null;
+        return $this;
     }
     
-
+    public function setColors($font="",$background=""){
+        $style = "";
+        if($font!=""){
+            $style .= " color: ".$font.";";
+        }
+        if($background!=""){
+            $style .= " background-color: ".$background.";";
+        }
+        if(isset($style)){
+            $this->background = "style ='".$style."'";    
+        }
+        
+        return $this;
+    }
  
     public function createInput($type,$id,$value="",$size){
         #if($value!=""){
@@ -74,7 +88,7 @@ class Content{
     public function getHidenInput($id,$value){
         $idDiv = ' id = "'.$id.'"';
         $valueDiv = $value;
-        $this->div .= '<input type="hidden" class="form-control" id="'.$id.'" value = "'.$value.'"/>';
+        $this->div .= "<input type='hidden' class='form-control' id='".$id."' value = '".$value."'/>";
     }
     
     public function getComment($id){
@@ -96,8 +110,12 @@ class Content{
             return $this->createCell($div,$size);
     }
     
-    public function showResult(){
+    public function returnResult(){
         return $this -> div;
+    }
+    
+    public function showResult(){
+        echo $this -> div;
     }
 }
 ?>

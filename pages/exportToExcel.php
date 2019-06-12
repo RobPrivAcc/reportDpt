@@ -11,7 +11,7 @@
 	
 	
 	$dt = new DATE();
-	echo $_POST['type'];
+	//echo $_POST['type'].'<br/>';
 	$fileName = $_POST["shop"];
 	$typeName = $_POST["type"];
 	
@@ -19,12 +19,26 @@
 					      "Sub category" => json_decode($_POST['subTypeArray'], true),
 						  "Products" => json_decode($_POST['productsArray'], true));
 	
+	//echo "fileName = ".$_POST["shop"]."<br/>";
+	//echo "typeName = ".$_POST["type"]."<br/>";
+	//
+	//echo "Category => json_decode(POST['typesArray']<br/>";
+	//print_r(json_decode($_POST['typesArray'], true));
+	//echo "<br/><br/><br/>";
+	//
+	//echo "Sub category => json_decode(POST['subTypeArray']<br/>";
+	//print_r(json_decode($_POST['subTypeArray'], true));
+	//echo "<br/><br/><br/>";
+	//
+	//echo "Products => json_decode(POST['productsArray']<br/>";
+	//print_r(json_decode($_POST['productsArray'], true));
+	//echo "<br/><br/><br/>";
 	$objPHPExcel = new PHPExcel();
 	
 	$objPHPExcel->getProperties()->setCreator("Robert Kocjan")
 								 ->setLastModifiedBy("Robert Kocjan")
 								 ->setTitle("Sale by Department Raport");
-
+	
 	$cat = null;
 	
 	$types = array("Category","Sub category","Products");
@@ -59,7 +73,7 @@
 			if($key == "Category"){
 				$cat = $k;
 			}
-
+	
 			$objPHPExcel->setActiveSheetIndex($index)->setCellValue('A'.$cellNo, $k);
 			$objPHPExcel->setActiveSheetIndex($index)->setCellValue('B'.$cellNo, $v[$dt->getDates()['prevYear']['year']]);
 			$objPHPExcel->setActiveSheetIndex($index)->setCellValue('C'.$cellNo, $v[$dt->getDates()['currYear']['year']]);
@@ -71,7 +85,7 @@
 		
 		$index++;
 	}
-
+	
 	$objPHPExcel->setActiveSheetIndex(0);
 	
 	$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
@@ -99,6 +113,6 @@
 	}else{
 		 echo "Ups.. something went wrong and file wasn't created. Contact Robert.";    
 	}
-
+	
 	echo $show;
 ?>
