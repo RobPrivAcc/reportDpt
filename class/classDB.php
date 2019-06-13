@@ -62,7 +62,7 @@
      }
      
      public function getShopsName(){
-      $shopNameArray = "";
+      $shopNameArray = array();
       
       for ($i = 0; $i < $this -> getMaxIndex(); $i++){
          $shopNameArray[] = array('shopName' => $this -> dbConnectionArray[$i]['shopName'],'shopNo' => $this -> dbConnectionArray[$i]['shopNo']);
