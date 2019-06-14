@@ -33,20 +33,20 @@
 			->createCell("<h3>".$type."</h3>",12,' font-weight-bold');
     
 //  Categories
-	$content->createRow("","",false)
-			->createCell('SubCategory',6,' font-weight-bold')
+	$content->createCell('SubCategory',6,' font-weight-bold')
 			->createCell($dt->getYear()['lastYear'],2,' font-weight-bold')
 			->createCell($dt->getYear()['currentYear'],2,' font-weight-bold')
-			->createCell('Growth',2,' font-weight-bold');
+			->createCell('Growth',2,' font-weight-bold')
+			->createRow("","",false);
 			
 
 //  Sub Categories
     foreach($subTypeArrayStats as $key => $value){
-        $content->createRow(" selectedSubCatRow","",false)
-				->createCell($key,6,' subCatName')
+        $content->createCell($key,6,' subCatName')
 				->createCell($value[$dt->getYear()['lastYear']],2,'')
 				->createCell($value[$dt->getYear()['currentYear']],2,'')
-				->createCell($value['growth'],2,'');
+				->createCell($value['growth'],2,'')
+				->createRow(" selectedSubCatRow","",false);
     }
 //	Hidden values
     $content->getHidenInput('shop',$shopName);

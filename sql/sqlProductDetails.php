@@ -31,15 +31,15 @@
 	
 	$statsArray = $type->getSaleDetails();
 	
-	$content->createRow("","",false)
-			->createCell("<h3>".$catType." > ".$catSubType."</h3>",12,' font-weight-bold')->setColors("","e89120");
+	$content->createCell("<h3>".$catType." > ".$catSubType."</h3>",12,' font-weight-bold')->setColors("","e89120")
+			->createRow("","",false);
 	
 	
-	$content->createRow("","",false)
-			->createCell('Product Name',6,' font-weight-bold')
+	$content->createCell('Product Name',6,' font-weight-bold')
 			->createCell($dt->getYear()['lastYear'],2,' font-weight-bold')
 			->createCell($dt->getYear()['currentYear'],2,' font-weight-bold')
-			->createCell('Growth',2,' font-weight-bold');
+			->createCell('Growth',2,' font-weight-bold')
+			->createRow("","",false);
 	
 	
 	$productArray = array();
@@ -55,11 +55,11 @@
 			$curentYearStats = $value[$dt->getYear()['currentYear']];
 		}
 		
-		$content->createRow("","",true)
-				->createCell($key,6)
+		$content->createCell($key,6)
 				->createCell($lastYearStats,2)
 				->createCell($curentYearStats,2)
-				->createCell($type->growth($lastYearStats, $curentYearStats),2);
+				->createCell($type->growth($lastYearStats, $curentYearStats),2)
+				->createRow("","",true);
 
 
 		$productArray[$key] = array($dt->getYear()['lastYear'] => $lastYearStats,

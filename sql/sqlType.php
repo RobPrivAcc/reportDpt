@@ -24,18 +24,18 @@
 	
 	$content = new Content();
 
-	$content->createRow("","",false)
-			->createCell('Category',6,' font-weight-bold')
+	$content->createCell('Category',6,' font-weight-bold')
 			->createCell($dt->getYear()['lastYear'],2,' font-weight-bold')
 			->createCell($dt->getYear()['currentYear'],2,' font-weight-bold')
-			->createCell('Growth',2,' font-weight-bold');
+			->createCell('Growth',2,' font-weight-bold')
+			->createRow("","",false);
 	
 	foreach($typeArray as $key => $value){
-		$content -> createRow(" selectedCatRow","",false)
-				 -> createCell($key,6,' catName')
+		$content-> createCell($key,6,' catName')
 				 -> createCell($value[$dt->getYear()['lastYear']],2,'')
 				 -> createCell($value[$dt->getYear()['currentYear']],2,'')
-				 -> createCell($value["growth"],2,'');
+				 -> createCell($value["growth"],2,'')
+				 -> createRow(" selectedCatRow","",false);
 	}
 	
 	$content->getHidenInput('shop',$shopName);
