@@ -8,10 +8,10 @@ class Content{
     protected $cellArray = array();
     protected $div = null;
     protected $background = null;
+    protected $cellDiv = null;
     
     public function createRow($class="",$id="",$zebra = true){
-        $rowContent = "";
-        
+                
         if($zebra == true){
             if($this->zebraRow == true){
                 $zebra =" style='background-color: #efefef;'";
@@ -34,16 +34,22 @@ class Content{
         
         $this->zebraRow = !$this->zebraRow;
         
-        for($i=0; $i < count($this->cellArray); $i++){
-            $rowContent .= $this->cellArray[$i];
-        }
+        //for($i=0; $i < count($this->cellArray); $i++){
+        //    $rowContent .= $this->cellArray[$i];
+        //    echo $this->cellArray[$i];
+        //}
 
-        $this->cellArray = array();
+        //$this->cellArray = array();
+        $rowContent = $this->cellDiv;
+        
+        $this->cellDiv = null;
         $this->div .= '<div '.$divId.'class="row'.$divClass.'"'.$zebra.'>'.$rowContent.'</div>';
+        
         return $this;
     }
     
     public function createCell($rowContent,$size,$class="",$id="",$value=""){
+        
         $idDiv = $id;
         $valueDiv = $value;
         $style = "";
@@ -57,8 +63,10 @@ class Content{
         }
         
         //return '<div class="col-sm-'.$size.'"'.$idDiv.$valueDiv.'>'.$rowContent.'</div>';
-        $this->cellArray[] = '<div class="col-sm-'.$size.$class.'"'.$idDiv.$valueDiv.$style.'>'.$rowContent.'</div>';
+        //$this->cellArray[] = '<div class="col-sm-'.$size.$class.'"'.$idDiv.$valueDiv.$style.'>'.$rowContent.'</div>';
+        $this->cellDiv .= '<div class="col-sm-'.$size.$class.'"'.$idDiv.$valueDiv.$style.'>'.$rowContent.'</div>';
         //$this->background = null;
+        
         return $this;
     }
     
@@ -110,8 +118,8 @@ class Content{
             return $this->createCell($div,$size);
     }
     
-    public function returnResult(){
-        return $this -> div;
+    public function returnDiv(){
+        echo $this -> cellDiv;
     }
     
     public function showResult(){

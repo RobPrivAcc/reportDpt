@@ -127,7 +127,7 @@
                     [Type of Item] = '".$type."'
                 GROUP BY [Name of item]
                 ORDER BY [Name of item] ASC;";
-        
+                
         $query = $this->pdo->prepare($sql);
         $query->execute();
         
@@ -136,7 +136,6 @@
         while($row = $query->fetch()){
             $this->detailArray[$row['Name of item']][$year] = round($row['value'],2);
         }
-        
     }    
     
     
