@@ -1,4 +1,5 @@
 <?php
+session_start();
     include("../class/classCategories.php");
     include("../class/classDb.php");
     include("../class/classXML.php");
@@ -7,6 +8,7 @@
     
 
     $dt = new DATE();
+	$dt->dateInit($_SESSION['dateFrom'],$_SESSION['dateTo']);
     
     $xml = new xmlFile($_SERVER["DOCUMENT_ROOT"].'/dbXML.xml');
     

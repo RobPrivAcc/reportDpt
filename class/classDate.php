@@ -1,13 +1,24 @@
 <?php
 class DATE{
      
-    private $dateToday = null;
-    private $currentYearStart = null;
+    private $dateToday;
+    private $currentYearStart;
     private $datesArray = array();
     
-    public function __construct(){
-        $this->dateToday = date("Y-m-d");
-        $this->currentYearStart = date("Y")."-01-01";
+    //public function __construct($dateStart = date("Y-m-d"), $dateEnd = date("Y")."-01-01"){
+    //    $this->dateToday = $dateStart;
+    //    $this->currentYearStart = $dateEnd;
+    //}
+    
+    public function dateInit($dateStart = '', $dateEnd = ''){
+        if ($dateStart == '' && $dateEnd == ''){
+            $this->dateToday = date("Y-m-d");
+            $this->currentYearStart = date("Y")."-01-01";
+        }else{
+            $this->currentYearStart = $dateStart;
+            $this->dateToday = $dateEnd;
+        }
+
     }
     
     public function getCurrentYearDate(){

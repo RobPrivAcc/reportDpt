@@ -1,13 +1,18 @@
 <?php
+session_start();
     include("../class/classCategories.php");
     include("../class/classDb.php");
     include("../class/classXML.php");
     include("../class/classDate.php");
     include("../class/classContent.php");
     
+	$_SESSION['dateFrom'] = $_POST['dateFrom'];
+	$_SESSION['dateTo'] = $_POST['dateTo'];
+	
     $shopName = $_POST['shopName'];
     
     $dt = new DATE();
+	$dt->dateInit($_SESSION['dateFrom'],$_SESSION['dateTo']);
 	
     $xml = new xmlFile($_SERVER["DOCUMENT_ROOT"].'/dbXML.xml');
     $db = new dbConnection($xml->getConnectionArray());

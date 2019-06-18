@@ -1,5 +1,5 @@
 <?php
-
+session_start();
     include("../class/classCategories.php");
     include("../class/classDb.php");
     include("../class/classXML.php");
@@ -10,8 +10,11 @@
 	$shopName = $_POST['shopName'];
 	$type = $_POST['type'];
     
+	echo $_SESSION['dateFrom'].'  -  '.$_SESSION['dateTo'];
+	
     $dt = new DATE();
- 
+	$dt->dateInit($_SESSION['dateFrom'],$_SESSION['dateTo']);
+	
 	$content = new Content();
     
     

@@ -1,3 +1,6 @@
+<?php
+	session_start();
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -5,12 +8,12 @@
         <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+		
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/myCSS.css">
-  </head>
+	</head>
   <body>
     <?php
         include("class/classProduct.php");
@@ -20,11 +23,40 @@
     <div class="container">
       <div class="row">
         <div class='col-xs-12 col-12 text-center'>
-          <h2> Sale by Department Raport</h2><h6>  <?php include("version.php");?></h6>
+          <h2> Sale by Department Raport</h2>
+					<h6><?php include("version.php");?></h6>
         </div>
       </div>
+ 
+			<div class='row'>
+				<div class='col-xs-4 col-4'>
+					<form id='dateChangeRadio'>
+						
+							<!--<input type="radio" name="dateRadio" value="fullRange"  class="form-check-input" checked /><label class="form-check-label">Full year</label>-->
+							<!--<input type="radio" name="dateRadio" value="pickedRange" class="form-check-input"/><label class="form-check-label">Date range</label>-->
+						<div class="radio radio-inline">
+					        <input type="radio" id="inlineRadio1" value="fullRange" name="dateRadio" checked>
+					        <label for="inlineRadio1"> Full year </label>
 
-
+					        <input type="radio" id="inlineRadio2" value="pickedRange" name="dateRadio">
+					        <label for="inlineRadio2"> Date range </label>
+					    </div>
+					</form>
+				</div>
+				
+				<div class='col-xs-3 col-3 dateInputs'>
+					Date from: <input type="text" class="form-control form-control-sm" name="dateFrom" id="dateFrom" value="" />
+				</div>
+				
+				<div class='col-xs-3 col-3 dateInputs'>
+					Date to: <input type="text" class="form-control form-control-sm" name="dateTo" id="dateTo" value="" />
+				</div>
+				
+				<div class='col-xs-2 col-2'>
+					</div>
+				
+			</div>
+			
 		<?php
 			$xml = new xmlFile($_SERVER["DOCUMENT_ROOT"].'/dbXML.xml');
 			$db = new dbConnection($xml->getConnectionArray());
@@ -56,18 +88,13 @@
 			
 		?>
       
-      <div class="row">
+      <div class='row'>
         <div class='col-xs-10 col-10'>
 				<?php
 					echo $shops;
 				?>
 				</div>
 					
-<!--				<div class='col-xs-5 col-5'>
-					<?php
-						//echo $types;
-          ?>  
-        </div>-->
         <div class='col-xs-1 col-1'>
             <button class = "btn btn-secondary" id = "searchBtn"><i class="fa fa-toggle-right fa-lg" aria-hidden="true"></i></button>
         </div>
@@ -76,6 +103,8 @@
         </div>   
       </div>
       
+
+			
       <div class="row">
         <div class='col-xs-12 col-12'>
           <div id="result" style="width: 100%;"></div>
@@ -88,14 +117,39 @@
         </div>
       </div>
 
-    </div>  
-        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    </div>
+	    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+		
+				<!-- Include Date Range Picker -->
+		<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>		
+				
+		<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+		<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+
+		  <script>
+					$(function() {
+						$('input[name="dateFrom"]').daterangepicker({
+								singleDatePicker: true,
+								showDropdowns: true,
+								 locale: {
+										format: 'YYYY-MM-DD'
+								 }
+					 });
+								$('input[name="dateTo"]').daterangepicker({
+								singleDatePicker: true,
+								showDropdowns: true,
+								 locale: {
+										format: 'YYYY-MM-DD'
+								 }
+					 });
+				});
+			</script>
   
   <script>
-        
 //    $( document ).ready(function() {
 //        console.log( "ready!" );
 //				$('#details').html();
@@ -122,7 +176,14 @@
 					var spinner = '<Div class="text-center"><i class="fa fa-cog fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span></DIV>';
 					$('#result').html(spinner);
 					
-					$.post( "sql/sqlType.php", { shopName: shopsName })
+					var dateFrom = '';
+					var dateTo = '';
+					if($('input[name="dateRadio"]:checked').val() === 'pickedRange'){
+						dateFrom = $('#dateFrom').val();
+						dateTo = $('#dateTo').val();
+					}
+
+					$.post( "sql/sqlType.php", { shopName: shopsName, dateFrom: dateFrom, dateTo: dateTo })
 						.done(function( data ) {
 								$('#result').html(data);
 								$('#details').html("");
@@ -131,6 +192,18 @@
 				}
 		});
 
+		$(document).ready(function(){
+			$(".dateInputs").hide();
+			      //var val = $('input[name="dateRadio"]:checked').val();
+			$('#dateChangeRadio').change(function(){
+				if($('input[name="dateRadio"]:checked').val() === 'fullRange'){
+					$(".dateInputs").hide();
+				}else{
+					$(".dateInputs").show();
+				}
+      });
+		});
+		
 		$(document).on("mouseover", ".row.selectedCatRow",function() {
 				$(this).addClass(' selectedCat');
 				$(this).css({"background-color": "#9bb8e8","cursor": "pointer"});
@@ -205,9 +278,9 @@
 					$('#exportDivButton').html("");
 				});	
 		});
-			
-			
   </script>
+
+
 
   </body>
 </html>
