@@ -12,7 +12,10 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/myCSS.css">
+	
+	<!-- My CSS files   -->
+	<link rel="stylesheet" href="css/myCSS.css">
+	<link rel="stylesheet" href="css/switchSlider.css">
 	</head>
   <body>
     <?php
@@ -29,11 +32,8 @@
       </div>
  
 			<div class='row'>
-				<div class='col-xs-4 col-4'>
-					<form id='dateChangeRadio'>
-						
-							<!--<input type="radio" name="dateRadio" value="fullRange"  class="form-check-input" checked /><label class="form-check-label">Full year</label>-->
-							<!--<input type="radio" name="dateRadio" value="pickedRange" class="form-check-input"/><label class="form-check-label">Date range</label>-->
+				<div class='col-xs-2 col-2'>
+<!--					<form id='dateChangeRadio'>
 						<div class="radio radio-inline">
 					        <input type="radio" id="inlineRadio1" value="fullRange" name="dateRadio" checked>
 					        <label for="inlineRadio1"> Full year </label>
@@ -41,19 +41,33 @@
 					        <input type="radio" id="inlineRadio2" value="pickedRange" name="dateRadio">
 					        <label for="inlineRadio2"> Date range </label>
 					    </div>
-					</form>
-				</div>
-				
-				<div class='col-xs-3 col-3 dateInputs'>
-					Date from: <input type="text" class="form-control form-control-sm" name="dateFrom" id="dateFrom" value="" />
-				</div>
-				
-				<div class='col-xs-3 col-3 dateInputs'>
-					Date to: <input type="text" class="form-control form-control-sm" name="dateTo" id="dateTo" value="" />
-				</div>
-				
-				<div class='col-xs-2 col-2'>
+					</form>-->
+
+					<!-- Rounded switch -->
+					<div id='divDateRangeId'>
+						Full year
 					</div>
+					<label class="switch">
+						<input type="checkbox" id='chbDateRangeId' checked=checked>
+						<span class="slider round"></span>
+					</label> 
+				</div>
+				
+				<div class='col-xs-8 col-8'>
+					<div id='dateDiv'>
+						<div class='row'>
+							<div class='col-xs-4 col-4 dateInputs'>
+								Date from: <input type="text" class="form-control form-control-sm" name="dateFrom" id="dateFrom" value="" />
+							</div>
+							
+							<div class='col-xs-4 col-4 dateInputs'>
+								Date to: <input type="text" class="form-control form-control-sm" name="dateTo" id="dateTo" value="" />
+							</div>
+							
+							<div class='col-xs-4 col-4'></div>
+						</div>
+					</div>
+				</div>
 				
 			</div>
 			
@@ -150,6 +164,19 @@
 			</script>
   
   <script>
+	
+		$('#chbDateRangeId').click(function() {
+			if($('#chbDateRangeId').is(':checked')){
+				
+				$('#divDateRangeId').html("Full year");
+				$('#dateDiv').hide();
+			}else{
+				$('#divDateRangeId').html("Date range");
+				$('#dateDiv').show();
+			}
+		});
+	
+	
 //    $( document ).ready(function() {
 //        console.log( "ready!" );
 //				$('#details').html();
@@ -178,7 +205,7 @@
 					
 					var dateFrom = '';
 					var dateTo = '';
-					if($('input[name="dateRadio"]:checked').val() === 'pickedRange'){
+					if($('#chbDateRangeId').is(':checked') === false){
 						dateFrom = $('#dateFrom').val();
 						dateTo = $('#dateTo').val();
 					}
@@ -195,8 +222,8 @@
 		$(document).ready(function(){
 			$(".dateInputs").hide();
 			      //var val = $('input[name="dateRadio"]:checked').val();
-			$('#dateChangeRadio').change(function(){
-				if($('input[name="dateRadio"]:checked').val() === 'fullRange'){
+			$('#chbDateRangeId').click(function() {
+				if($('#chbDateRangeId').is(':checked')){
 					$(".dateInputs").hide();
 				}else{
 					$(".dateInputs").show();
