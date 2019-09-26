@@ -122,8 +122,13 @@ class Content{
         echo $this -> cellDiv;
     }
     
-    public function showResult(){
-        echo $this -> div;
+    public function showResult($hr = false){
+        if($hr == true){
+            echo $this -> div."<hr/>";
+        }else{
+            echo $this -> div;
+        }
+
     }
 }
 ?>

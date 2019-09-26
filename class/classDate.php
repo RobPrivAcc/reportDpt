@@ -9,17 +9,27 @@ class DATE{
     //    $this->dateToday = $dateStart;
     //    $this->currentYearStart = $dateEnd;
     //}
-    
-    public function dateInit($dateStart = '', $dateEnd = ''){
-        if ($dateStart == '' && $dateEnd == ''){
+    public function __construct($dateStart = '', $dateEnd = '')
+    {
+        if ($dateStart === '' && $dateEnd === ''){
             $this->dateToday = date("Y-m-d");
             $this->currentYearStart = date("Y")."-01-01";
         }else{
             $this->currentYearStart = $dateStart;
             $this->dateToday = $dateEnd;
         }
-
     }
+
+//    public function dateInit($dateStart = '', $dateEnd = ''){
+//        if ($dateStart == '' && $dateEnd == ''){
+//            $this->dateToday = date("Y-m-d");
+//            $this->currentYearStart = date("Y")."-01-01";
+//        }else{
+//            $this->currentYearStart = $dateStart;
+//            $this->dateToday = $dateEnd;
+//        }
+//
+//    }
     
     public function getCurrentYearDate(){
         return array('dateStart' => $this->currentYearStart, 'dateEnd'=> $this->dateToday, 'year' => date("Y"));

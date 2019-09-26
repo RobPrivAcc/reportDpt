@@ -10,16 +10,21 @@ class product extends PDOException{
     //creating connection string to petco to getallheaders product list
 
     
-    function openConnection($dbConnectionArray){
-            try{
-                $this->pdo = new PDO($dbConnectionArray["server"],$dbConnectionArray["user"],$dbConnectionArray["password"]); 
-            }
-            catch (PDOException $e){
-               // var_dump($e);
-                $this->pdo = new PDO($dbConnectionArray["localServer"],$dbConnectionArray["user"],$dbConnectionArray["password"]);
-            }
+//    function openConnection($dbConnectionArray){
+//            try{
+//                $this->pdo = new PDO($dbConnectionArray["server"],$dbConnectionArray["user"],$dbConnectionArray["password"]);
+//            }
+//            catch (PDOException $e){
+//               // var_dump($e);
+//                $this->pdo = new PDO($dbConnectionArray["localServer"],$dbConnectionArray["user"],$dbConnectionArray["password"]);
+//            }
+//    }
+
+    function __construct($pdo)
+    {
+        $this->pdo = $pdo;
     }
-    
+
     function getTypeSubtypeArray(){
         $array = array();
         

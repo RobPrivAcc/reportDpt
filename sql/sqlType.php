@@ -5,28 +5,46 @@ session_start();
     include("../class/classXML.php");
     include("../class/classDate.php");
     include("../class/classContent.php");
-    
-	$_SESSION['dateFrom'] = $_POST['dateFrom'];
-	$_SESSION['dateTo'] = $_POST['dateTo'];
-	
+    include("../class/Types.php");
+    include("../class/Growth.php");
+
+    $typeArray = array();
+
+	$_SESSION['dateFrom'] = (isset($_POST['dateFrom']) ? $_POST['dateFrom'] : '');
+	$_SESSION['dateTo'] = (isset($_POST['dateTo']) ? $_POST['dateTo'] : '');
+
+
     $shopName = $_POST['shopName'];
-    
-    $dt = new DATE();
-	$dt->dateInit($_SESSION['dateFrom'],$_SESSION['dateTo']);
-	
+
+
+    $dt = new DATE($_SESSION['dateFrom'],$_SESSION['dateTo']);
+
     $xml = new xmlFile($_SERVER["DOCUMENT_ROOT"].'/dbXML.xml');
     $db = new dbConnection($xml->getConnectionArray());
 	
-	$catType = new CATEGORY();
-	$catType->openConnection($db->getDbConnectionByName($shopName));
+	$catType = new CATEGORY($db->getDbConnectionByName($shopName));
+
 	
 	$catType->setDateArray($dt->getDates());
-	
-    $catType->saleTypeDetails($dt->getCurrentYearDate());
-    
-	
-	$typeArray = $catType->getTypeArray();
-	
+
+    $types = new Types($db->connect(2));
+    $types = $types->getTypes();
+
+    foreach ($types as $type => $subType){
+//        $typeArray[$type] = $catType->saleTypeDetails($type);
+        $gr = new Growth();
+        $gr->setName($type);
+        $gr->setDates($dt->getDates());
+
+        foreach ($catType->saleTypeDetails($type) as $year => $total) {
+            $gr->setData($year,$total);
+        }
+        $gr->setGrowth();
+
+        $typeArray[] = $gr;
+        unset($gr);
+    }
+
 	$content = new Content();
 
 	$content->createCell('Category',6,' font-weight-bold')
@@ -36,16 +54,14 @@ session_start();
 			->createRow("","",false);
 	
 	foreach($typeArray as $key => $value){
-		$content-> createCell($key,6,' catName')
-				 -> createCell($value[$dt->getYear()['lastYear']],2,'')
-				 -> createCell($value[$dt->getYear()['currentYear']],2,'')
-				 -> createCell($value["growth"],2,'')
+		$content-> createCell($value->getName(),6,' catName')
+				 -> createCell($value->getDataSet()[$value->getPrevYear()],2,'')
+				 -> createCell($value->getDataSet()[$value->getCurrentYear()],2,'')
+				 -> createCell($value->getGrowth(),2,'')
 				 -> createRow(" selectedCatRow","",false);
 	}
-	
+
 	$content->getHidenInput('shop',$shopName);
 	$content->getHidenInput('typesArray',json_encode($typeArray));
 	
-	$content->showResult();
-	
-?>
+	$content->showResult(true);

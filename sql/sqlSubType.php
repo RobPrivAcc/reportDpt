@@ -1,34 +1,53 @@
 <?php
 session_start();
-    include("../class/classCategories.php");
-    include("../class/classDb.php");
-    include("../class/classXML.php");
-    include("../class/classDate.php");
-    include("../class/classContent.php");
-	
-	
+    include('../class/classCategories.php');
+    include('../class/classDb.php');
+    include('../class/classXML.php');
+    include('../class/classDate.php');
+    include('../class/classContent.php');
+    include('../class/Types.php');
+    include('../class/Growth.php');
+
+
 	$shopName = $_POST['shopName'];
 	$type = $_POST['type'];
-    
-	echo $_SESSION['dateFrom'].'  -  '.$_SESSION['dateTo'];
-	
-    $dt = new DATE();
-	$dt->dateInit($_SESSION['dateFrom'],$_SESSION['dateTo']);
-	
+    $typesArray = $_POST['typesArray'];
+
+    $typeArray = array();
+
+    $dt = new DATE($_SESSION['dateFrom'],$_SESSION['dateTo']);
+
 	$content = new Content();
-    
-    
+
     $xml = new xmlFile($_SERVER["DOCUMENT_ROOT"].'/dbXML.xml');
+
     $db = new dbConnection($xml->getConnectionArray());
 	
-	$catType = new CATEGORY();
-	$catType->openConnection($db->getDbConnectionByName($shopName));
-	
+	$catType = new CATEGORY($db->getDbConnectionByName($shopName));
+
 	$catType->setDateArray($dt->getDates());
-	
-	$catType->saleSubTypeDetails($type);
-	
-	$subTypeArrayStats = $catType->getTypeArray();
+
+    $types = new Types($db->connect(2));
+    $types = $types->getTypes();
+
+    foreach($types[$type] as $key => $val){
+//        $typeArray[$val] = $catType->saleTypeDetails($type,$val);
+
+        $gr = new Growth();
+        $gr->setName($val);
+        $gr->setDates($dt->getDates());
+
+        foreach ($catType->saleTypeDetails($type,$val) as $year => $total) {
+            $gr->setData($year,$total);
+        }
+        $gr->setGrowth();
+
+        $typeArray[] = $gr;
+        unset($gr);
+    }
+
+
+
 	
     $content = new Content();
 //	header
@@ -43,20 +62,26 @@ session_start();
 			->createRow("","",false);
 			
 
+	/*
+	 * 		$content-> createCell($value->getName(),6,' catName')
+				 -> createCell($value->getDataSet()[$value->getPrevYear()],2,'')
+				 -> createCell($value->getDataSet()[$value->getCurrentYear()],2,'')
+				 -> createCell($value->getGrowth(),2,'')
+				 -> createRow(" selectedCatRow","",false);
+	 * */
+
 //  Sub Categories
-    foreach($subTypeArrayStats as $key => $value){
-        $content->createCell($key,6,' subCatName')
-				->createCell($value[$dt->getYear()['lastYear']],2,'')
-				->createCell($value[$dt->getYear()['currentYear']],2,'')
-				->createCell($value['growth'],2,'')
+    foreach($typeArray as $key => $value){
+        $content->createCell($value->getName(),6,' subCatName')
+				->createCell($value->getDataSet()[$value->getPrevYear()],2,'')
+				->createCell($value->getDataSet()[$value->getCurrentYear()],2,'')
+				->createCell($value->getGrowth(),2,'')
 				->createRow(" selectedSubCatRow","",false);
     }
 //	Hidden values
     $content->getHidenInput('shop',$shopName);
     $content->getHidenInput('type',$type);    
 	$content->getHidenInput('typesArray',$_POST['typesArray']);
-    $content->getHidenInput('subTypeArray',json_encode($subTypeArrayStats));    
+    $content->getHidenInput('subTypeArray',json_encode($typeArray));
     
-    $content->showResult();
-
-?>
+    $content->showResult(true);

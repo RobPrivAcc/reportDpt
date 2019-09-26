@@ -5,34 +5,50 @@ session_start();
     include("../class/classXML.php");
     include("../class/classDate.php");
     include("../class/classContent.php");
-    
+	include("../class/Growth.php");
 
-    $dt = new DATE();
-	$dt->dateInit($_SESSION['dateFrom'],$_SESSION['dateTo']);
+
+
+    $dt = new DATE($_SESSION['dateFrom'],$_SESSION['dateTo']);
+
     
     $xml = new xmlFile($_SERVER["DOCUMENT_ROOT"].'/dbXML.xml');
     
     $db = new dbConnection($xml->getConnectionArray());
-	
-    
+
+
     $catType = $_POST['type'];
 	$catSubType = $_POST['subType'];
 	$shopName = $_POST['shopName'];
-	
-    //$type = new product();
-	$type = new CATEGORY();
-	$type->openConnection($db->getDbConnectionByName($shopName));
-    
-	
-	$content = new Content();
 
-    $statsArray = array(); 
-	$type->saleProductDetails($catType,$catSubType,$dt->getPreviousYearDate());
-	$type->saleProductDetails($catType,$catSubType,$dt->getCurrentYearDate());
-	
-	
-	$statsArray = $type->getSaleDetails();
-	
+
+$typeStats = json_decode($_POST['typesArray']);
+
+
+	$type = new CATEGORY($db->getDbConnectionByName($shopName));
+	$type->setDateArray($dt->getDates());
+
+    $statsArray = array();
+	$saleArray = $type->saleTypeDetails($catType,$catSubType,true);
+
+
+//	return;
+//
+foreach ($saleArray as $item => $value) {
+	$gr = new Growth();
+	$gr->setName($item);
+	$gr->setDates($dt->getDates());
+
+	foreach ($value as $year => $total) {
+		$gr->setData($year,$total);
+	}
+	$gr->setGrowth();
+
+	$statsArray[] = $gr;
+	unset($gr);
+}
+
+	$content = new Content();
 	$content->createCell("<h3>".$catType." > ".$catSubType."</h3>",12,' font-weight-bold')->setColors("","e89120")
 			->createRow("","",false);
 	
@@ -42,31 +58,27 @@ session_start();
 			->createCell($dt->getYear()['currentYear'],2,' font-weight-bold')
 			->createCell('Growth',2,' font-weight-bold')
 			->createRow("","",false);
-	
-	
+
+
 	$productArray = array();
-	
+
+
     foreach($statsArray as $key => $value){
-		$lastYearStats = 0;
-		$curentYearStats = 0;
-		if(isset($value[$dt->getYear()['lastYear']])){
-			$lastYearStats = $value[$dt->getYear()['lastYear']];
-		}
-		
-		if(isset($value[$dt->getYear()['currentYear']])){
-			$curentYearStats = $value[$dt->getYear()['currentYear']];
-		}
-		
-		$content->createCell($key,6)
-				->createCell($lastYearStats,2)
-				->createCell($curentYearStats,2)
-				->createCell($type->growth($lastYearStats, $curentYearStats),2)
+
+        $content->createCell($value->getName(),6)
+				->createCell($value->getDataSet()[$value->getPrevYear()],2)
+				->createCell($value->getDataSet()[$value->getCurrentYear()],2)
+				->createCell($value->getGrowth(),2)
 				->createRow("","",true);
 
+/*
+ *
+ * */
+		$productArray[] = array('name' => $value->getName(),
+                                'data' => array($value->getPrevYear() => $value->getDataSet()[$value->getPrevYear()],
+                                                $value->getCurrentYear() => $value->getDataSet()[$value->getCurrentYear()]),
+                                'growth' => $value->getGrowth());
 
-		$productArray[$key] = array($dt->getYear()['lastYear'] => $lastYearStats,
-									$dt->getYear()['currentYear'] => $curentYearStats,
-									'growth' => $type->growth($lastYearStats, $curentYearStats));
     }
 	
 	$headerArray = array($dt->getYear()['lastYear'],$dt->getYear()['currentYear'],'Growth');
@@ -79,4 +91,4 @@ session_start();
 	$content->getHidenInput('productsArray',json_encode($productArray));
 	
 	$content->showResult();
-?>
+

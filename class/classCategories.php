@@ -7,67 +7,114 @@
         private $result = array();
         private $dateArray = array();
         private $detailArray = array();
+        private $shop = null;
+        private $type = null;
     
-    
-    function openConnection($dbConnectionArray){
-            try{
-                $this->pdo = new PDO($dbConnectionArray["server"],$dbConnectionArray["user"],$dbConnectionArray["password"]); 
-            }
-            catch (PDOException $e){
-                $this->pdo = new PDO($dbConnectionArray["localServer"],$dbConnectionArray["user"],$dbConnectionArray["password"]);
-            }
-            $this->setTypeSubtypeArray();
+
+    function __construct($pdo)
+    {
+        $this->pdo = $pdo;
     }
-        
+
     function setDateArray($array){
         $this->dateArray = $array;
     }
-    
-    function setTypeSubtypeArray(){
-        $array = array();
-        $sql = "SELECT [Type] ,[SubType] FROM [Types]";
 
-        $query = $this->pdo->prepare($sql);
-        $query->execute();
-        
-        while($row = $query->fetch()){
-            if($row["SubType"] != "."){
-                $array[$row["Type"]][] = $row["SubType"];
-            }
-        }
-        $this->categoryArray = $array;
+    public function setShop($shop)
+    {
+        $this->shop = $shop;
+        return $this;
     }
-    
+
+    public function setType($type)
+    {
+        $this->type = $type;
+        return $this;
+    }
+
     function getTypeSubtypeArray(){
         return $this->categoryArray;
     }
-    
-    function saleTypeDetails($date){
+
+
+    function saleTypeDetails($type, $subType = '',$isProduct = false){
+        $subTypeSql = '';
+        $sqlName = '';
+        $sqlGroup = '';
+        $sqlSort = '';
+
+        if($isProduct === true){
+            $sqlName = '[Name of item], ';
+            $sqlGroup = ' GROUP BY [Name of item]';
+            $sqlSort = ' ORDER BY [Name of item] ASC';
+
+        }
+
+
+
+        $paramArray[':type'] = $type;
+
+        if($subType != ''){
+            $subTypeSql = ' [SubType] = :subType AND ';
+            $paramArray[':subType'] = $subType;
+        }
+
         foreach($this->dateArray as $k => $v){
-            foreach($this->categoryArray as $key => $value){
-                $sql = "SELECT SUM([QuantityBought] * [Selling Price]) as [value] 
-                    FROM Orders 
-                        inner join Stock on [Name of Item] = [NameOfItem] 
-                        inner join [Days] on [Order Number] = OrderNo
-                    WHERE 
-                        [Date] > :dateStart AND
-                        [Date] < :dateEnd AND
-                        [Type of Item] = :type;";
-                        
-                    $paramArray = array(":dateStart" => $v['dateStart'],
-                                        ":dateEnd" => $v['dateEnd'],
-                                        ":type" => $key);
-                                    
-                    $query = $this->pdo->prepare($sql);
-                    $query->execute($paramArray);
-    
+            $paramArray[':dateStart'] = $v['dateStart'];
+            $paramArray[':dateEnd'] = $v['dateEnd'];
+
+                $sql = "SELECT {$sqlName}SUM([QuantityBought] * [Selling Price]) as [value]
+                        FROM Orders 
+                            inner join Stock on [Name of Item] = [NameOfItem] 
+                            inner join [Days] on [Order Number] = OrderNo
+                        WHERE 
+                            [Date] > :dateStart AND
+                            [Date] < :dateEnd AND
+                            {$subTypeSql}
+                            [Type of Item] = :type
+                            {$sqlGroup}
+                            {$sqlSort};";
+
+
+                $query = $this->pdo->prepare($sql);
+                $query->execute($paramArray);
+
+                $value = 0;
+
+
                 while($row = $query->fetch()){
-                    if($key != '-'){
-                        $this->result[$key][$v['year']] = round($row['value'],2);
+
+
+                    $value = $row['value'];
+                    if($type != '-'){
+                        if($isProduct == false) {
+                            $this->result[$v['year']] = round($value, 2);
+                        }else{
+                            //$this->result[] = ->setData($v['year'], round($value,2));
+                            $this->result[$row['Name of item']][$v['year']] = round($value,2);
+                        }
                     }
                 }
-            }    
+
         }
+
+        //var_dump($this->result);
+/*        echo '<pre>' . var_export($this->result, true) . '</pre>';
+        return;
+
+        if($isProduct === true){
+
+            foreach ($this->result as $name => $values){
+                echo $name.'<br/>';
+                $this->result[$name]['growth'] = $this->growth($values);
+            }
+
+        }*/
+
+        //$this->result['growth'] = $this->growth($this->result);
+       //var_dump($this->result);
+
+        return $this->result;
     }
     
     function getTypeArray(){
@@ -76,45 +123,7 @@
         }
         return $this->result;
     }
-    
-    
-    function saleSubTypeDetails($type){
-        
-        //print_r($this->dateArray);
-        //echo count($this->categoryArray[$type])." ".$this->categoryArray[$type][0];
-        
-        foreach($this->dateArray as $k => $v){
-            foreach($this->categoryArray[$type] as $key => $value){
-//                 [:dateStart] => 2018-01-01 [:dateEnd] => 2018-05-24 [:type] => Bird [:subType] => Bedding
-                $sql = "SELECT SUM([QuantityBought] * [Selling Price]) as [value]
-                        FROM Orders
-                            inner join Stock on [Name of Item] = [NameOfItem]
-                            inner join [Days] on [Order Number] = OrderNo
-                        WHERE
-                            [Date] > :dateStart AND
-                            [Date] < :dateEnd AND
-                            [SubType] = :subType AND
-                            [Type of Item] = :type;";
-                        
-                $paramArray = array(":dateStart" => $v['dateStart'],
-                                    ":dateEnd" => $v['dateEnd'],
-                                    ":type" => $type,
-                                    ":subType" => $value);
-                
-                $query = $this->pdo->prepare($sql);
-                $query->execute($paramArray);
-                
-                while($row = $query->fetch()){
-                    if($key != '-'){
-                        $this->result[$value][$v['year']] = round($row['value'],2);
-                    }
-                }
-            }    
-        }
-        
-    }
-    
-    
+
     function saleProductDetails($type,$subType,$date){
         $sub = "";
         if(isset($subType)){
@@ -131,7 +140,8 @@
                     [Type of Item] = '".$type."'
                 GROUP BY [Name of item]
                 ORDER BY [Name of item] ASC;";
-                
+          echo $sql;
+          return;
         $query = $this->pdo->prepare($sql);
         $query->execute();
         
@@ -143,7 +153,7 @@
     }    
     
     
-    function growth($prev, $current){
+/*    function growth($prev, $current){
         $result = 0;
         $isProc = "%";
         if($prev == 0){
@@ -155,15 +165,41 @@
             
             /*
             $result = $current-$prev;
-            $isProc = "";*/
+            $isProc = "";
         }else{
             $result = (($current-$prev)/$prev)*100;
         }
         return round($result,2).$isProc;
-    }
+    }*/
+
+        function growth($data){
+            $result = 0;
+            $isProc = "%";
+            $values = array_values($data);
+
+            $prev = $values[0];
+            $current = $values[1];
+            if($prev !=0 && $current != 0) {
+                if ($prev === 0) {
+                    if ($prev != $current) {
+                        $result = 100;
+                    } else {
+                        $result = $current - $prev;
+                    }
+
+                    /*
+                    $result = $current-$prev;
+                    $isProc = "";*/
+                } else {
+                    $result = (($current - $prev) / $prev) * 100;
+                }
+            }else{
+                $result = 0;
+            }
+            return round($result,2).$isProc;
+        }
     
     function getSaleDetails(){
         return $this->detailArray;
     }
 }
-?>
