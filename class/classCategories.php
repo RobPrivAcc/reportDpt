@@ -83,9 +83,10 @@
 
 
                 while($row = $query->fetch()){
+                    if(isset($row['value'])){
+                        $value = $row['value'];
+                    }
 
-
-                    $value = $row['value'];
                     if($type != '-'){
                         if($isProduct == false) {
                             $this->result[$v['year']] = round($value, 2);
